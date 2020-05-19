@@ -87,6 +87,19 @@ public:
     table = new TableForDay[30];
     daysAvable = 30;
   }
+  TableFor30Days& operator=(TableFor30Days &c1) {
+    int i, j, k, m, l;
+    for (i = 0; i < 30; ++i) {
+      table[i].countOfFilms = c1.table[i].countOfFilms;
+      for (j = 0; j < c1.table[i].countOfFilms; ++j)
+        table[i].films[j] = c1.table[i].films[j];
+      for (l = 0; l < 5; ++l)
+        for (m = 0; m < 15; ++m)
+          for (k = 0; k < 10; ++k)
+            table[i].halls[l].hall[m][k].isFree = c1.table[i]
+            .halls[l].hall[m][k].isFree;
+    }
+  }
 };
 
 class Cinema {
@@ -97,7 +110,7 @@ public:
   //int reserve_place(int _numOfPlaces, bool VIP, int numOfFilm, bool check);
   TableForDay* get_info_for_3days(int day);
   void add_new_day(Film *film, int _countOfFilms);
-  TableFor30Days move_array();
+  void move_array();
 };
 
 

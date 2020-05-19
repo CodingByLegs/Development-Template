@@ -6,6 +6,19 @@ int main() {
   Film *data;
   string names[5];
   int i;
+  /*
+  int *arr, *newArr;
+  arr = new int[5];
+  newArr = new int[5];
+  for (int i = 0; i < 5; ++i) {
+    arr[i] = i + 1;
+    newArr[i] = i + 10;
+  }
+  newArr[4] = arr[9];
+  for (int i = 0; i < 7; ++i)
+    cout << newArr[i] << " ";
+  cout << endl;
+  */
   names[0] = "A";
   names[1] = "B";
   names[2] = "C";

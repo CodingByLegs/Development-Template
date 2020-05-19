@@ -85,10 +85,17 @@ void Cinema::disableBook(TableForDay tbl, int day, int dayToday, int _numOfPlace
   }
 }
 */
-// Õ¿œ»—¿“‹!
-TableFor30Days Cinema::move_array() {
-  TableFor30Days res;
-
-  return res;
+void Cinema::move_array() {
+  int i, j, k, m, l;
+  for (i = 0; i < 30; ++i) {
+   tableMonth.table[i].countOfFilms = tableMonth.table[i + 1].countOfFilms;
+    for (j = 0; j < tableMonth.table[i + 1].countOfFilms; ++j)
+      tableMonth.table[i].films[j] = tableMonth.table[i + 1].films[j];
+    for (l = 0; l < 5; ++l)
+      for (m = 0; m < 15; ++m)
+        for (k = 0; k < 10; ++k)
+          tableMonth.table[i].halls[l].hall[m][k].isFree = tableMonth.table[i + 1]
+          .halls[l].hall[m][k].isFree;
+  }
 }
 
