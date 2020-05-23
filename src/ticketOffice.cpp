@@ -1,6 +1,5 @@
 
 #include "ticketOffice.h"
-
 // to set time
 void TicketOffice::startTimer() {
   t = time(NULL);
@@ -11,9 +10,10 @@ void TicketOffice::menu() {
   setlocale(LC_ALL, "Russian");
   bool flag1, VIP, paid, paid1;
   int choice, i, j, k, count, count1, err, err1, cost;
-  int *ticketsNotPaid;
+  int ticketsNotPaid[100];
   TableForDay tbl;
-
+  for (i = 0; i < 100; ++i)
+    ticketsNotPaid[i] = -1;
   flag1 = true;
   cout << "Добро пожаловат в меню!" << endl;
   while (flag1) {
@@ -57,7 +57,7 @@ void TicketOffice::menu() {
       cin >> choice;
       if (choice == 0)
         break;
-      TakeOrder(tableToday, choice, dayToday - 1, true);
+      TakeOrder(tableMonth.table[dayToday - 1], choice, dayToday - 1, true);
       break;
     case 2:
       cout << "Выьерите сеанс:" << endl;
@@ -197,8 +197,8 @@ void TicketOffice::menu() {
       cin >> choice;
       if (choice == 0)
         break;
-      TakeOrder(tableMonth.table[dayToday + choice - 1], choice,
-        dayToday + choice, true);
+      TakeOrder(tableMonth.table[dayToday + choice - 2], choice,
+        dayToday + choice - 2, true);
       break;
     case 5:
       cout << "Выбирите день для бронирования" << endl;
@@ -236,9 +236,8 @@ void TicketOffice::menu() {
         cout << ")" << endl;
       }
       cin >> choice;
-      j = choice;
-      TakeOrder(tableMonth.table[dayToday + choice - 1], j,
-        dayToday + choice - 1, false);
+      TakeOrder(tableMonth.table[dayToday + choice - 2], choice,
+        dayToday + choice - 2, false);
       break;
     case 6:
       cout << "Выбирите день на который бронировали билеты" << endl;
@@ -263,17 +262,17 @@ void TicketOffice::menu() {
         break;
       cout << "Выбирите номер вашего заказа для оплаты:" << endl;
       j = 1;
-      ticketsNotPaid = new int[longOfreservered];
-      for (i = 0; i < longOfreservered; ++i) {
+      for (i = 0; i < longOfreservered; ++i) {;
         if (reserved[i].day == dayToday + choice - 2 && !reserved[i].IsPaid) {
           cout << j << ". " << reserved[i].ID << endl;
-          ticketsNotPaid[j - 1] = i;
+          ticketsNotPaid[j] = i;
           j++;
         }
       }
       cin >> choice;
+      choice++;  // to fix bag
       tbl = tableMonth.table[dayToday + k - 1];
-      j = reserved[ticketsNotPaid[choice - 1]].numOfFilm;
+      j = reserved[ticketsNotPaid[choice - 1]].numOfFilm + 1;
       cout << "Название фильма: " << tbl.films[j - 1].name << endl;
       cout << "Начало сеанса: " << tbl.films[j - 1].timeStart / 60
         << ":";
@@ -281,7 +280,7 @@ void TicketOffice::menu() {
         cout << "0" << tbl.films[j - 1].timeStart % 60 << endl;
       else
         cout << tbl.films[j - 1].timeStart % 60 << endl;
-      cout << "Ваш номекр билета: " << reserved[ticketsNotPaid[choice - 1]].ID
+      cout << "Ваш номер билета: " << reserved[ticketsNotPaid[choice - 1]].ID
         << endl;
       if (reserved[ticketsNotPaid[choice - 1]].count > 0) {
         if (reserved[ticketsNotPaid[choice - 1]].IsVip)
@@ -318,6 +317,7 @@ void TicketOffice::menu() {
       cout << "Итоговая цена: " << cost << endl;
       // отмечаем как оплаченные
       reserved[ticketsNotPaid[choice - 1]].IsPaid = true;
+      cout << endl;
       break;
     case 7:
       cout << "Выбирите день на который бронировали билеты" << endl;
@@ -340,41 +340,49 @@ void TicketOffice::menu() {
       k = choice - 1;
       if (choice == 0)
         break;
-      cout << "Выбирите номер вашего заказа для оплаты:" << endl;
       j = 1;
-      ticketsNotPaid = new int[longOfreservered];
       for (i = 0; i < longOfreservered; ++i) {
-        if (reserved[i].day == dayToday + choice - 1 && reserved[i].IsPaid) {
+        if (reserved[i].day == dayToday + choice - 2 && !reserved[i].IsPaid) {
+          if (j == 1)
+            cout << "Выбирите номер вашего заказа для оплаты:" << endl;
           cout << j << ". " << reserved[i].ID << endl;
-          ticketsNotPaid[j - 1] = i;
+          ticketsNotPaid[j] = i;
           j++;
         }
       }
+      if (j == 1) {
+        cout << "На этот день нет забронированных билетов" << endl;
+        break;
+      }
+
       cin >> choice;
-      if (reserved[ticketsNotPaid[choice - 1]].count > 0)
+      reserved[ticketsNotPaid[choice]].day = -1;
+      if (reserved[ticketsNotPaid[choice]].count > 0)
         disableBook(tableMonth.table[dayToday + choice - 2],
-          dayToday + choice - 2, reserved[ticketsNotPaid[choice - 1]].count,
-          reserved[ticketsNotPaid[choice - 1]].IsVip,
+          dayToday + choice - 2, reserved[ticketsNotPaid[choice]].count,
+          reserved[ticketsNotPaid[choice]].IsVip,
           tableMonth.table[dayToday + choice - 2]
-          .films[reserved[ticketsNotPaid[choice - 1]].numOfFilm].numOfFilm);
+          .films[reserved[ticketsNotPaid[choice]].numOfFilm].numOfFilm);
       else {
         disableBook(tableMonth.table[dayToday + choice - 2],
-          dayToday + choice - 2, reserved[ticketsNotPaid[choice - 1]].count * -1,
-          reserved[ticketsNotPaid[choice - 1]].IsVip,
+          dayToday + choice - 2, reserved[ticketsNotPaid[choice]].count * -1,
+          reserved[ticketsNotPaid[choice]].IsVip,
           tableMonth.table[dayToday + choice - 2]
-          .films[reserved[ticketsNotPaid[choice - 1]].numOfFilm].numOfFilm);
+          .films[reserved[ticketsNotPaid[choice]].numOfFilm].numOfFilm);
 
         disableBook(tableMonth.table[dayToday + choice - 2],
-          dayToday + choice - 2, reserved[ticketsNotPaid[choice - 1]].count,
-          reserved[ticketsNotPaid[choice - 1] + 1].IsVip,
+          dayToday + choice - 2, reserved[ticketsNotPaid[choice]].count,
+          reserved[ticketsNotPaid[choice] + 1].IsVip,
           tableMonth.table[dayToday + choice - 2]
-          .films[reserved[ticketsNotPaid[choice - 1] + 1].numOfFilm].numOfFilm);
+          .films[reserved[ticketsNotPaid[choice] + 1].numOfFilm].numOfFilm);
       }
+      disableReserve();
       cout << "Бронь была снята" << endl;
       break;
     default:
       break;
     }
+    cout << endl;
   }
 }
 
@@ -535,9 +543,10 @@ int TicketOffice::TakeOrder(TableForDay &tbl, int j, int day, bool willPay) {
 }
 
 int TicketOffice::countCost(int _numOfPlaces, bool VIP, int _numOfFilm, int day) {
-  int i, cost;
-  double koef;
+  int i;
+  double koef, cost;
   startTimer();
+  day--;
   for (i = 0; i < tableMonth.table[dayToday + day].countOfFilms; ++i) {
     if (tableMonth.table[dayToday + day].films[i].numOfFilm == _numOfFilm) {
       if (tableMonth.table[dayToday + day].films[i].timeStart >= 420
@@ -565,7 +574,7 @@ int TicketOffice::countCost(int _numOfPlaces, bool VIP, int _numOfFilm, int day)
       break;
     }
   }
-  return cost * _numOfPlaces;
+  return (int)(cost * _numOfPlaces);
 }
 
 void TicketOffice::startOffice() {
@@ -573,11 +582,14 @@ void TicketOffice::startOffice() {
   tableToday.countOfFilms = tableMonth.table[dayToday - 1].countOfFilms;
   for (i = 0; i < tableToday.countOfFilms; ++i)
     tableToday.films[i] = tableMonth.table[dayToday - 1].films[i];
-  for (i = 0; i < 5; ++i)
-    for (j = 0; j < 15; ++j)
-      for (k = 0; k < 10; ++k)
+  for (i = 0; i < 5; ++i) {
+    for (j = 0; j < 15; ++j) {
+      for (k = 0; k < 10; ++k) {
         if (!tableMonth.table[dayToday - 1].halls[i].hall[j][k].isFree)
           tableToday.halls[i].hall[j][k].isFree = false;
+      }
+    }
+  }
   sizeOfreservered = 0;
   longOfreservered = 0;
   reserved = resizeReserved(reserved);
@@ -593,10 +605,10 @@ void TicketOffice::checkDate() {
   // if month changed time1->tm_mday = 1
   int i, j, k;
   i = 0;
-  // убираем резервы за прошлый день
+  // убираем резервы за прошлый день ---------- Работает не совсм коректно
   while (reserved[i].day == dayToday)
     reserved[i++].day = -1;
-  shiftReserve(reserved, i);
+  disableReserve();
   if (dayNow != time1->tm_mday) {
     dayToday++;
     dayNow = time1->tm_mday;
@@ -618,7 +630,7 @@ void TicketOffice::checkDate() {
 void TicketOffice::disableBook(TableForDay &tbl, int day, int _numOfPlaces,
   bool VIP, int _numOfFilm) {
   int i, j, count = 0;
-  if (day > tableMonth.daysAvable) {
+  if (day > 30 - tableMonth.daysAvable) {
     throw logic_error("Out of range");
     return;
   }
@@ -681,7 +693,6 @@ int TicketOffice::reserve_place(TableForDay &tbl ,int _numOfPlaces, bool VIP,
 
 ReserveredTickets* TicketOffice::resizeReserved(ReserveredTickets *arr) {
   ReserveredTickets *tmp = new ReserveredTickets[sizeOfreservered + 10];
-  delete[] arr;
   for (int i = 0; i < sizeOfreservered; ++i) {
     tmp[i].day = arr[i].day;
     tmp[i].count = arr[i].count;
@@ -691,13 +702,14 @@ ReserveredTickets* TicketOffice::resizeReserved(ReserveredTickets *arr) {
     tmp[i].ID = arr[i].ID;
   }
   sizeOfreservered += 10;
+  delete[] arr;
   return tmp;
 }
-// не присваивает значение коректно
+
 void TicketOffice::addReserve(int _day, int _count, bool _IsVip, bool _IsPaid,
   int _numOfFilm) {
   int i;
-  i = ++longOfreservered;
+  i = longOfreservered++;
   if (sizeOfreservered == i)
     reserved = resizeReserved(reserved);
   reserved[i].day = _day;
@@ -706,17 +718,97 @@ void TicketOffice::addReserve(int _day, int _count, bool _IsVip, bool _IsPaid,
   reserved[i].IsVip = _IsVip;
   reserved[i].numOfFilm = _numOfFilm;
   reserved[i].ID = numOfTicket;
-  numOfTicket++;
-  
+  numOfTicket++; 
 }
-// если shift > половины длинны массива, то жопа(
-void TicketOffice::shiftReserve(ReserveredTickets* arr, int shift) {
-  for (int i = 0; i < sizeOfreservered - shift; ++i) {
-    arr[i].count = arr[i + shift].count;
-    arr[i].day = arr[i + shift].day;
-    arr[i].IsPaid = arr[i + shift].IsPaid;
-    arr[i].IsVip = arr[i + shift].IsVip;
-    arr[i].numOfFilm = arr[i + shift].numOfFilm;
-    arr[i].ID = arr[i + shift].ID;
+
+void TicketOffice::disableReserve() {
+  int i, j = 0;
+  for (i = 0; i < sizeOfreservered; ++i)
+    if (reserved[i].day != -1) {
+      reserved[j].day = reserved[i].day;
+      reserved[j].count = reserved[i].count;
+      reserved[j].ID = reserved[i].ID;
+      reserved[j].IsPaid = reserved[i].IsPaid;
+      reserved[j].IsVip = reserved[i].IsVip;
+      reserved[j].numOfFilm = reserved[i].numOfFilm;
+      j++;
+    }
+}
+
+
+bool operator==(Film const &c1, Film const &c2) {
+  if (c1.duration != c2.duration || c1.name != c2.name
+    || c1.numOfFilm != c2.numOfFilm || c1.numOfHall != c2.numOfHall
+    || c1.timeStart != c2.timeStart)
+    return false;
+  return true;
+}
+
+bool operator==(Hall const &c1, Hall const &c2) {
+  int i, j;
+  for (i = 0; i < 15; ++i) {
+    for (j = 0; j < 10; ++j) {
+      if (c1.hall[i][j].isFree != c2.hall[i][j].isFree
+        || c1.hall[i][j].isVIP != c2.hall[i][j].isVIP) {
+        return false;
+      }
+
+    }
   }
+  return true;
+}
+
+bool operator==(TableForDay const &c1, TableForDay const &c2) {
+  int i;
+  if (c1.countOfFilms != c2.countOfFilms)
+    return false;
+  for (i = 0; i < c1.countOfFilms; ++i)
+    if (!(c1.films[i] == c2.films[i]))
+      return false;
+  for (i = 0; i < 5; ++i)
+    if (!(c1.halls[i] == c2.halls[i]))
+      return false;
+  return true;
+}
+
+bool operator==(TableFor30Days const &c1, TableFor30Days const &c2) {
+  int i, j, k, m, l;
+  for (i = 0; i < 30; ++i) {
+    if (!(c1.table[i].countOfFilms == c2.table[i].countOfFilms))
+      return false;
+    for (j = 0; j < c1.table[i].countOfFilms; ++j)
+      if (!(c1.table[i].films[j] == c2.table[i].films[j]))
+        return false;
+    for (l = 0; l < 5; ++l)
+      if (!(c1.table[i].halls[l] == c2.table[i].halls[l]))
+        return false;
+
+  }
+  return true;
+}
+
+bool operator==(TicketOffice const &c1, TicketOffice const &c2) {
+  int lg, i;
+  if (c1.longOfreservered < c2.longOfreservered)
+    lg = c1.longOfreservered;
+  else
+    lg = c2.longOfreservered;
+  for (i = 0; i < lg; ++i)
+    if (c1.reserved[i].count != c2.reserved[i].count
+      || c1.reserved[i].day != c2.reserved[i].day
+      || c1.reserved[i].ID != c2.reserved[i].ID
+      || c1.reserved[i].IsPaid != c2.reserved[i].IsPaid
+      || c1.reserved[i].IsVip != c2.reserved[i].IsVip
+      || c1.reserved[i].numOfFilm != c2.reserved[i].numOfFilm)
+      return false;
+  if (lg == c1.longOfreservered) {
+    for (i; i < c2.longOfreservered; ++i)
+      if (c2.reserved[i].day != -1)
+        return false;
+  } else {
+    for (i; i < c1.longOfreservered; ++i)
+      if (c1.reserved[i].day != -1)
+        return false;
+  }
+  return true;
 }

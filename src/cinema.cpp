@@ -45,46 +45,7 @@ void Cinema::add_new_day(Film *film, int _countOfFilms) {
   tableMonth.daysAvable--;
   // rest will be do automaticly
 }
-/*
-void Cinema::disableBook(TableForDay tbl, int day, int dayToday, int _numOfPlaces, 
-  bool VIP,int _numOfFilm) {
-  int i, j, count = 0;
-  if (day > tableMonth.daysAvable) {
-    throw logic_error("Out of range");
-    return;
-  }
-  if (VIP) {
-    for (i = 0; i < 5; ++i) {
-      for (j = 0; j < 10; ++j) {
-        if (!tableMonth.table[dayToday + day]
-          .halls[tableMonth.table[dayToday + day].films[_numOfFilm]
-          .numOfHall].hall[i][j].isFree) {
-          tableMonth.table[dayToday + day]
-            .halls[tableMonth.table[dayToday + day].films[_numOfFilm]
-            .numOfHall].hall[i][j].isFree = true;
-          if (++count == _numOfPlaces)
-            return;
-        }
-      }
-    }
-  }
-  else {
-    for (i = 5; i < 15; ++i) {
-      for (j = 0; j < 10; ++j) {
-        if (!tableMonth.table[dayToday + day]
-          .halls[tableMonth.table[dayToday + day].films[_numOfFilm]
-          .numOfHall].hall[i][j].isFree) {
-          tableMonth.table[dayToday + day]
-            .halls[tableMonth.table[dayToday + day].films[_numOfFilm]
-            .numOfHall].hall[i][j].isFree = true;
-          if (++count == _numOfPlaces)
-            return;
-        }
-      }
-    }
-  }
-}
-*/
+
 void Cinema::move_array() {
   int i, j, k, m, l;
   for (i = 0; i < 30; ++i) {

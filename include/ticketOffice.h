@@ -19,7 +19,7 @@ public:
   bool IsPaid;
 
   ReserveredTickets() {
-    day = 0;
+    day = -1;
     count = 0;
     numOfFilm = 0;
     IsVip = false;
@@ -60,7 +60,8 @@ public:
   ReserveredTickets* resizeReserved(ReserveredTickets *arr);
   void addReserve(int _day, int _count, bool _IsVip, bool IsPaid,
     int _numOfFilm);
-  void shiftReserve(ReserveredTickets* arr, int shift);
+  void disableReserve();
+  friend bool operator==(TicketOffice const &c1, TicketOffice const &c2);
 };
 
 

@@ -27,14 +27,20 @@ public:
       for (j = 0; j < 10; ++j)
         hall[i][j].isVIP = true;
   }
+  friend bool operator==(Hall const &c1, Hall const &c2);
   Hall& operator=(Hall &c1) {
     int i, j;
-    for (i = 0; i < 15; ++i)
-      for (j = 0; j < 15; ++j)
-        hall[i][j] = c1.hall[i][j];
+    for (i = 0; i < 15; ++i) {
+      for (j = 0; j < 10; ++j) {
+        hall[i][j].isFree = c1.hall[i][j].isFree;
+        hall[i][j].isVIP = c1.hall[i][j].isVIP;
+      }
+    }
     return *this;
   }
 };
+
+
 
 class Film {
 public:
@@ -66,7 +72,11 @@ public:
     numOfFilm = c1.numOfFilm;
     return *this;
   }
+  friend bool operator==(Film const &c1, Film const &c2);
+
 };
+
+
 
 class TableForDay {
 public:
@@ -77,7 +87,23 @@ public:
     films = new Film[15];
     countOfFilms = 0;
   }
+  ~TableForDay() {
+    countOfFilms = 0;
+    delete[] films;
+  }
+  TableForDay& operator=(TableForDay &c1) {
+    int i;
+    countOfFilms = c1.countOfFilms;
+    for (i = 0; i < countOfFilms; ++i)
+      films[i] = c1.films[i];
+    for (i = 0; i < 5; ++i)
+      halls[i] = c1.halls[i];
+    return *this;
+  }
+  friend bool operator==(TableForDay const &c1,TableForDay const &c2);
 };
+
+
 
 class TableFor30Days {
 public:
@@ -94,12 +120,15 @@ public:
       for (j = 0; j < c1.table[i].countOfFilms; ++j)
         table[i].films[j] = c1.table[i].films[j];
       for (l = 0; l < 5; ++l)
-        for (m = 0; m < 15; ++m)
-          for (k = 0; k < 10; ++k)
-            table[i].halls[l].hall[m][k].isFree = c1.table[i]
-            .halls[l].hall[m][k].isFree;
+        table[i].halls[l] = c1.table[i].halls[l];
     }
+    return *this;
   }
+  ~TableFor30Days() {
+    daysAvable = 0;
+    delete[] table;
+  }
+  friend bool operator==(TableFor30Days const &c1, TableFor30Days const &c2);
 };
 
 class Cinema {
